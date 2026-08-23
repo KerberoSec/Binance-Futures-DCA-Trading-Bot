@@ -346,7 +346,7 @@ All operational parameters are defined at the top of `code.py` and can be custom
 
 ### 1. Clone or Download the Project Directory
 
-Ensure your directory contains `code.py`, `requirements.txt`, and `.env.example`.
+Ensure your directory contains `code.py`, `requirements.txt`, `.env.example`, `setup.sh`, and `docker-compose.yml`.
 
 ### 2. Create and Activate a Python Virtual Environment
 
@@ -425,93 +425,150 @@ To safeguard your trading capital, adhere strictly to the following security pro
 
 ### Option 1: Interactive Terminal Execution
 
-Ideal for initial testing, dry-runs, and monitoring live output:
+Ideal for initial testing, dry-runs, and monitoring live output in real-time:
 
 ```bash
 python code.py
 ```
+
+---
 
 ### Option 2: Linux Background Execution with `tmux`
 
+If connecting over SSH to a remote server and running interactively:
+
 ```bash
+# 1. Start a persistent tmux session
 tmux new -s dcabot
+
+# 2. Activate virtual environment and run
 source venv/bin/activate
 python code.py
+
+# 3. Detach from session (press Ctrl + B, then press D)
 ```
-* Press `Ctrl + B`, then press `D` to detach and leave the bot running in the background.
-* To reattach to the console later: `tmux attach -t dcabot`
 
-### Option 3: Linux Systemd Background Daemon (Production Recommended)
+To reattach to the console later:
+```bash
+tmux attach -t dcabot
+```
 
-Create a systemd unit file at `/etc/systemd/system/dcabot.service`:
+---
+
+### Option 3: 1-Click Automated VPS & Systemd Setup (`setup.sh` - Recommended)
+
+The repository includes a production-grade automated deployment script ([`setup.sh`](setup.sh)) designed for Ubuntu and Debian cloud servers.
+
+#### Automated Setup Actions:
+1. **System Prerequisites:** Installs `python3`, `python3-pip`, `python3-venv`, `git`, `curl`, `ufw`, `fail2ban`, and `tzdata`.
+2. **Virtual Environment:** Automatically creates `./venv` and installs all dependencies from `requirements.txt`.
+3. **Security Hardening:** Validates `.env` and locks file permissions to `chmod 600` (read/write restricted to owner).
+4. **Service Registration:** Dynamically generates `/etc/systemd/system/dca-bot.service` configured with your working directory and user.
+5. **Direct File Logging:** Configures the daemon to write all output directly to `bot.log` in your project directory (eliminating `journalctl` dependency).
+6. **Automatic Boot Persistence:** Registers `systemctl enable dca-bot` and starts the bot immediately in the background.
+
+#### 1-Click Launch:
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+#### Systemd Lifecycle & Management Commands:
+```bash
+# Check service health and uptime
+sudo systemctl status dca-bot
+
+# Restart the bot
+sudo systemctl restart dca-bot
+
+# Stop the bot
+sudo systemctl stop dca-bot
+
+# Start the bot
+sudo systemctl start dca-bot
+
+# Monitor live trade execution log file
+tail -f bot.log
+```
+
+---
+
+### Option 4: Manual Linux Systemd Daemon Setup
+
+If you prefer to configure the systemd unit manually:
+
+Create `/etc/systemd/system/dca-bot.service`:
 
 ```ini
 [Unit]
-Description=Futures DCA Trading Bot
-After=network.target
+Description=Futures DCA Trading Bot Background Daemon
+After=network.target network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/futures-dca-bot
-EnvironmentFile=/home/ubuntu/futures-dca-bot/.env
-ExecStart=/home/ubuntu/futures-dca-bot/venv/bin/python code.py
+WorkingDirectory=/home/ubuntu/dca-bot
+EnvironmentFile=/home/ubuntu/dca-bot/.env
+ExecStart=/home/ubuntu/dca-bot/venv/bin/python /home/ubuntu/dca-bot/code.py
 Restart=always
 RestartSec=10
-StandardOutput=journal
-StandardError=journal
+KillMode=mixed
+TimeoutStopSec=30
+StandardOutput=append:/home/ubuntu/dca-bot/bot.log
+StandardError=append:/home/ubuntu/dca-bot/bot.log
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Enable and start the system service:
+Enable and start the service:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable dcabot
-sudo systemctl start dcabot
-sudo systemctl status dcabot
+sudo systemctl enable dca-bot
+sudo systemctl start dca-bot
+sudo systemctl status dca-bot
 ```
 
-View real-time service logs:
+Monitor live logs:
 ```bash
-journalctl -u dcabot -f -n 100
+tail -f bot.log
 ```
 
-### Option 4: Docker Container Deployment
+---
 
-Create a `Dockerfile` in the root directory:
+### Option 5: Docker Container Deployment (`Dockerfile` & `docker-compose.yml`)
 
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["python", "code.py"]
-```
+The repository includes a complete containerization stack ([`Dockerfile`](Dockerfile), [`docker-compose.yml`](docker-compose.yml), and [`.dockerignore`](.dockerignore)) for containerized cloud deployment.
 
-Run via Docker Compose:
+#### Architecture of the Docker Stack:
+* **Base Image:** `python:3.11-slim` (official Debian Linux base, lightweight, zero build overhead).
+* **Layer Caching:** `requirements.txt` is copied and installed in an isolated layer, making rebuilds take less than 1 second.
+* **Real-Time Log Streaming:** Configured with `PYTHONUNBUFFERED=1` so container logs flush immediately without buffering delays.
+* **Volume Persistence:** Host volume bindings guarantee that `bot_state.json`, `trade_history.csv`, and `bot.log` persist on your physical machine across container restarts.
+* **Auto-Restart Policy:** `restart: unless-stopped` automatically recovers from server reboots and temporary network outages.
 
-```yaml
-version: '3.8'
-services:
-  dca-bot:
-    build: .
-    container_name: futures_dca_bot
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - ./bot_state.json:/app/bot_state.json
-      - ./trade_history.csv:/app/trade_history.csv
-      - ./bot.log:/app/bot.log
-```
+#### Docker Lifecycle Commands:
 
-Start the container:
 ```bash
+# 1. Build and start in background (detached mode)
 docker compose up -d
+
+# 2. View real-time live trading logs
 docker compose logs -f
+
+# 3. Check container status
+docker compose ps
+
+# 4. Restart container
+docker compose restart
+
+# 5. Stop container gracefully
+docker compose down
+
+# 6. Rebuild container after editing code.py
+docker compose build --no-cache && docker compose up -d
 ```
 
 ---
@@ -540,7 +597,7 @@ Before committing live capital, verify bot execution on the Binance Futures Test
 * Automatic collision avoidance: If `bot.log` is locked, the bot auto-increments to `bot1.log` or `bot2.log`.
 
 ### 2. State Persistence Engine (`bot_state.json`)
-State is saved atomically on regular intervals and upon graceful shutdown (`SIGINT` / `Ctrl+C`). Upon restart, the engine restores:
+State is saved atomically on regular intervals and upon graceful shutdown (`SIGINT` / `SIGTERM` / `Ctrl+C`). Upon restart, the engine restores:
 * `round_number`
 * `direction` (`LONG` or `SHORT`)
 * `peak_equity` (rolling baseline)
@@ -659,28 +716,87 @@ Total Cumulative Ladder Multiplier = Sum_{i=0}^{18} (1.10 ** i) ~= 51.159 * Base
 
 ## Troubleshooting, Edge Cases & Operational FAQ
 
-### Common Operational Edge Cases
+### 1. Binance API & Network Edge Cases
 
 1. **`BinanceAPIException: Timestamp for this request is outside of the recvWindow (code -1021)`**
-   * *Cause:* Local server clock drifted from Binance exchange server time.
-   * *Engine Behavior:* Automatically intercepted by `@retry` decorator; triggers `_sync_time_offset()`, recalculates millisecond drift, and re-executes immediately.
+   * *Root Cause:* Server hardware clock drifted by more than 1,000ms from Binance exchange server time.
+   * *Engine Behavior:* Automatically intercepted by the `@retry` decorator; calls `_sync_time_offset()`, recalculates server time drift via `GET /fapi/v1/time`, and retries the request seamlessly.
+   * *Manual VPS Fix (Optional):* Run `sudo apt-get install -y chrony && sudo systemctl restart chrony`.
 
-2. **`Binance Server 502 / 503 / 504 Gateway Errors`**
-   * *Cause:* Temporary Binance maintenance or Testnet gateway blip.
-   * *Engine Behavior:* Handled via exponential backoff (1s, 2s, 4s, 8s); execution resumes seamlessly without crashing.
+2. **`Binance Server 502 / 503 / 504 Gateway Timeouts`**
+   * *Root Cause:* Temporary exchange gateway maintenance or latency spike.
+   * *Engine Behavior:* Handled automatically via exponential backoff (1s, 2s, 4s, 8s) across up to 5 attempts without crashing.
 
 3. **`BinanceAPIException: API-key format invalid (code -2014)` or `Signature invalid (code -1022)`**
-   * *Resolution:* Verify that `BINANCE_API_KEY` and `BINANCE_API_SECRET` are properly formatted in `.env` without extra whitespace, quotation marks, or trailing spaces.
+   * *Resolution Checklist:*
+     * Verify `.env` contains valid credentials without quotation marks or trailing spaces (`BINANCE_API_KEY=your_key`).
+     * If using Binance Testnet, ensure `TESTNET = True` is set in `code.py` and that keys were generated on [testnet.binancefuture.com](https://testnet.binancefuture.com/).
+     * Verify that IP Access Whitelisting on Binance includes your server IPv4 address.
 
 4. **`API rate limit exceeded (HTTP 429 / 418)`**
-   * *Engine Behavior:* The thread-safe `RateLimiter` enforces a strict 2,000 request ceiling per 60-second window, preventing IP bans.
+   * *Engine Behavior:* The internal sliding-window `RateLimiter` enforces a strict 2,000 weight limit per 60-second window, preventing IP bans.
 
 ---
 
-### Frequently Asked Questions (FAQ)
+### 2. Systemd Deployment Troubleshooting (`setup.sh`)
+
+1. **Service status shows `failed` or `activating (auto-restart)`:**
+   * Inspect the log file for specific startup exceptions:
+     ```bash
+     tail -n 50 bot.log
+     ```
+   * Ensure `.env` exists and contains valid API credentials.
+
+2. **Permission Denied on `.env` or `bot.log`:**
+   * Fix file ownership to your active user:
+     ```bash
+     sudo chown -R ubuntu:ubuntu .
+     chmod 600 .env
+     sudo systemctl restart dca-bot
+     ```
+
+3. **Applying Code Changes After Editing `code.py`:**
+   * Whenever you modify `code.py` or `.env`, restart the background service:
+     ```bash
+     sudo systemctl restart dca-bot
+     ```
+
+---
+
+### 3. Docker Container Troubleshooting
+
+1. **`permission denied while trying to connect to the Docker daemon socket`:**
+   * Add your active user to the Docker group:
+     ```bash
+     sudo usermod -aG docker ubuntu
+     newgrp docker
+     ```
+
+2. **Container exits immediately after starting:**
+   * Inspect the container output:
+     ```bash
+     docker compose logs --tail 100
+     ```
+   * Verify that `.env` is present in the same directory as `docker-compose.yml`.
+
+3. **Updating Code Inside Docker Container:**
+   * Rebuild the Docker image without cache to apply updates:
+     ```bash
+     docker compose build --no-cache
+     docker compose up -d
+     ```
+
+4. **Cleaning up old/dangling Docker images:**
+   ```bash
+   docker system prune -f
+   ```
+
+---
+
+### 4. Frequently Asked Questions (FAQ)
 
 **Q: Can I run multiple trading pairs simultaneously?**
-**A:** Yes. Update `SYMBOLS = ["SOLUSDT", "BTCUSDT", "ETHUSDT"]` and adjust `ACCOUNT_ALLOCATION_FRACTION_PER_SYMBOL = 0.33` to distribute capital evenly across all pairs.
+**A:** Yes. Update `SYMBOLS = ["SOLUSDT", "BTCUSDT", "ETHUSDT"]` in `code.py` and adjust `ACCOUNT_ALLOCATION_FRACTION_PER_SYMBOL = 0.33` to distribute capital evenly across all pairs.
 
 **Q: What happens if my server reboots mid-trade?**
 **A:** The bot saves state continuously to `bot_state.json`. Upon reboot, `resync_symbol()` inspects open exchange positions and resting orders, matches existing algo IDs, recalculates VWAP, and resumes operation without opening duplicate positions.
@@ -720,8 +836,8 @@ SOFTWARE.
 
 ### Financial Risk Disclaimer
 
-> [!WARNING]
-> **Cryptocurrency futures trading involves substantial risk of financial loss and is not suitable for every investor.** High leverage can magnify both profits and losses.
+> **IMPORTANT REGULATORY AND RISK NOTICE:**
+> Cryptocurrency futures trading involves substantial risk of financial loss and is not suitable for every investor. High leverage can magnify both profits and losses.
 > 
 > * Past performance metrics and hypothetical backtest projections do not guarantee future returns.
 > * Always perform thorough testing on the **Binance Futures Testnet** before deploying live capital.
@@ -733,14 +849,25 @@ SOFTWARE.
 
 Developed and maintained by **Arun Kumar**.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arun%20Kumar-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://github.com/KerberoSec/)
-[![GitHub](https://img.shields.io/badge/GitHub-KerberoSec-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KerberoSec/)
+### Custom Development & Consulting
+
+I design and build institutional-grade algorithmic trading systems, custom quantitative strategies, automated execution pipelines, and AI-driven trading engines tailored to your specific requirements.
+
+* **Custom Trading Strategies:** DCA, Grid, Mean-Reversion, Momentum, Market Making, and Arbitrage models.
+* **Exchange Integrations:** Binance, Bybit, OKX, Hyperliquid, Deribit, and dYdX (Spot and Perpetual Futures).
+* **Automation & Infrastructure:** Linux VPS Daemons, Docker Stacks, WebSocket Data Pipelines, and Webhook Notifications.
+* **AI & Quantitative Systems:** Machine Learning signal models, trend regime filters, and dynamic risk management.
+
+If you need a custom trading bot, strategy automation, or algorithmic engine built according to your needs, feel free to reach out and connect.
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arun%20Kumar-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arunkumar31072006/)
+[![GitHub](https://img.shields.io/badge/GitHub-KerberoSec-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KerberoSec)
 [![Instagram](https://img.shields.io/badge/Instagram-@so__far__from__your__heart-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/)
 [![X](https://img.shields.io/badge/X-@ArunKumar310706-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
 
 | Platform | Profile Link | Handle |
 | :--- | :--- | :--- |
-| **LinkedIn** | [linkedin.com/in/KerberoSec](https://github.com/KerberoSec/) | `Arun Kumar` |
-| **GitHub** | [github.com/KerberoSec](https://github.com/KerberoSec/) | `@KerberoSec` |
-| **Instagram** | [instagram.com/so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/) | `@so_far_from_your_heart` |
-| **X / Twitter** | [x.com/ArunKumar310706](https://x.com/ArunKumar310706) | `@ArunKumar310706` |
+| **LinkedIn** | [https://www.linkedin.com/in/arunkumar31072006/](https://www.linkedin.com/in/arunkumar31072006/) | `Arun Kumar` |
+| **GitHub** | [https://github.com/KerberoSec](https://github.com/KerberoSec) | `@KerberoSec` |
+| **Instagram** | [https://www.instagram.com/so_far_from_your_heart/](https://www.instagram.com/so_far_from_your_heart/) | `@so_far_from_your_heart` |
+| **X / Twitter** | [https://x.com/ArunKumar310706](https://x.com/ArunKumar310706) | `@ArunKumar310706` |

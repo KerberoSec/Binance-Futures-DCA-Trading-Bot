@@ -7,8 +7,9 @@ An institutional-grade, fully autonomous algorithmic Dollar-Cost Averaging (DCA)
 specifically engineered for high-frequency execution on Binance USDT-M Perpetual Futures (SOLUSDT).
 
 Author: Arun Kumar
-LinkedIn: https://github.com/KerberoSec/
-GitHub: https://github.com/KerberoSec/
+Specialization: Custom Algorithmic Trading Systems, Quantitative Strategies & AI Engines
+LinkedIn: https://www.linkedin.com/in/arunkumar31072006/
+GitHub: https://github.com/KerberoSec
 Instagram: https://www.instagram.com/so_far_from_your_heart/
 X / Twitter: https://x.com/ArunKumar310706
 
@@ -153,6 +154,7 @@ import re
 import time
 import json
 import csv
+import signal
 import logging
 import threading
 import queue
@@ -3291,6 +3293,18 @@ class DCABot:
             t.start()
             threads.append(t)
 
+        def _handle_shutdown_signal(signum, frame):
+            sig_name = "SIGINT (Ctrl+C)" if signum == signal.SIGINT else "SIGTERM (Systemd/Docker)"
+            log.info(f"Shutdown requested via {sig_name}, stopping threads gracefully...")
+            self._stop_event.set()
+
+        try:
+            signal.signal(signal.SIGINT, _handle_shutdown_signal)
+            if hasattr(signal, "SIGTERM"):
+                signal.signal(signal.SIGTERM, _handle_shutdown_signal)
+        except Exception:
+            pass
+
         try:
             while not self._stop_event.is_set():
                 if self._stop_event.wait(WATCHDOG_INTERVAL_SECONDS):
@@ -3314,9 +3328,12 @@ class DCABot:
                         log.warning(f"[{symbol}] watchdog: flat with no open orders, reopening round")
                         self.open_round(symbol)
 
-        except KeyboardInterrupt:
+        except (KeyboardInterrupt, SystemExit):
             log.info("Shutdown requested, stopping threads...")
             self._stop_event.set()
+        finally:
+            self._stop_event.set()
+            self._save_state()
             if self.twm:
                 try:
                     self.twm.stop()
@@ -3324,7 +3341,7 @@ class DCABot:
                     pass
             for t in threads + getattr(self, "symbol_ws_threads", []):
                 try:
-                    t.join(timeout=5)
+                    t.join(timeout=3)
                 except Exception:
                     pass
             self._close_all_clients()
