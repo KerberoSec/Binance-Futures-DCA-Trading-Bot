@@ -8,6 +8,8 @@
 An institutional-grade, fully autonomous algorithmic Dollar-Cost Averaging (DCA) trading system engineered specifically for high-frequency execution on **Binance USDT-M Perpetual Futures** (e.g. `SOLUSDT`, `BTCUSDT`, `ETHUSDT`).
 
 The engine combines dynamic capital budgeting, geometric position scaling, volume-weighted average price (VWAP) recalculation, and a proprietary liquidation-anchored risk management architecture to capture consistent mean-reversion profits while safeguarding account capital against cascading flash crashes and black swan liquidation events.
+<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/4bcefaf7-3967-4a7e-ae39-ef79722bb371" />
+
 
 ---
 
