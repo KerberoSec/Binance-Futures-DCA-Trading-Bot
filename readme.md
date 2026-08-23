@@ -3,7 +3,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Binance Futures](https://img.shields.io/badge/Binance-USDT--M%20Perpetual%20Futures-F0B90B.svg)](https://www.binance.com/en/futures)
-[![Architecture](https://img.shields.io/badge/Architecture-Event--Driven%20%2B%20Multithreaded-brightgreen.svg)]()
+[![Architecture](https://img.shields.io/badge/Architecture-Event--Driven%20%2B%20Multithreaded-brightgreen.svg)](#end-to-end-system-architecture)
 
 An institutional-grade, fully autonomous algorithmic Dollar-Cost Averaging (DCA) trading system engineered specifically for high-frequency execution on **Binance USDT-M Perpetual Futures** (e.g. `SOLUSDT`, `BTCUSDT`, `ETHUSDT`).
 
@@ -15,23 +15,23 @@ The engine combines dynamic capital budgeting, geometric position scaling, volum
 
 1. [Key Architectural Highlights](#key-architectural-highlights)
 2. [End-to-End System Architecture](#end-to-end-system-architecture)
-3. [Finite State Machine & Round Lifecycle](#finite-state-machine--round-lifecycle)
-4. [Mathematical Trading Model & Capital Budgeting](#mathematical-trading-model--capital-budgeting)
+3. [Finite State Machine & Round Lifecycle](#finite-state-machine-round-lifecycle)
+4. [Mathematical Trading Model & Capital Budgeting](#mathematical-trading-model-capital-budgeting)
 5. [Dynamic Liquidation-Anchored Stop Loss Engine](#dynamic-liquidation-anchored-stop-loss-engine)
-6. [Directional Trading Modes & Trend Bias Engines](#directional-trading-modes--trend-bias-engines)
-7. [Multi-Tier Risk Management & Emergency Circuit Breakers](#multi-tier-risk-management--emergency-circuit-breakers)
+6. [Directional Trading Modes & Trend Bias Engines](#directional-trading-modes-trend-bias-engines)
+7. [Multi-Tier Risk Management & Emergency Circuit Breakers](#multi-tier-risk-management-emergency-circuit-breakers)
 8. [Complete Configuration Parameter Reference](#complete-configuration-parameter-reference)
-9. [Hardware, Software & Infrastructure Prerequisites](#hardware-software--infrastructure-prerequisites)
-10. [Step-by-Step Installation & Setup Walkthrough](#step-by-step-installation--setup-walkthrough)
-11. [Binance API Key Setup & Security Hardening](#binance-api-key-setup--security-hardening)
-12. [Deployment & Production Hosting Options](#deployment--production-hosting-options)
+9. [Hardware, Software & Infrastructure Prerequisites](#hardware-software-infrastructure-prerequisites)
+10. [Step-by-Step Installation & Setup Walkthrough](#step-by-step-installation-setup-walkthrough)
+11. [Binance API Key Setup & Security Hardening](#binance-api-key-setup-security-hardening)
+12. [Deployment & Production Hosting Options](#deployment-production-hosting-options)
 13. [Binance Futures Testnet Verification Protocol](#binance-futures-testnet-verification-protocol)
-14. [Observability, Persistence & Trade Analytics](#observability-persistence--trade-analytics)
-15. [Out-of-Band Real-Time Alerting (Telegram & Discord)](#out-of-band-real-time-alerting-telegram--discord)
-16. [Strategy Presets & Tuning Guide](#strategy-presets--tuning-guide)
-17. [Quantitative Financial Modeling & Performance Scenarios](#quantitative-financial-modeling--performance-scenarios)
-18. [Troubleshooting, Edge Cases & Operational FAQ](#troubleshooting-edge-cases--operational-faq)
-19. [MIT License & Risk Disclaimer](#mit-license--risk-disclaimer)
+14. [Observability, Persistence & Trade Analytics](#observability-persistence-trade-analytics)
+15. [Out-of-Band Real-Time Alerting (Telegram & Discord)](#out-of-band-real-time-alerting-telegram-discord)
+16. [Strategy Presets & Tuning Guide](#strategy-presets-tuning-guide)
+17. [Quantitative Financial Modeling & Performance Scenarios](#quantitative-financial-modeling-performance-scenarios)
+18. [Troubleshooting, Edge Cases & Operational FAQ](#troubleshooting-edge-cases-operational-faq)
+19. [MIT License & Risk Disclaimer](#mit-license-risk-disclaimer)
 
 ---
 
@@ -166,51 +166,58 @@ The core strategy executes a geometric Dollar-Cost Averaging grid designed to ca
 
 At the start of every round, base order margin is determined dynamically as a percentage of total allocated wallet equity:
 
-$$	ext{Base\_Margin\_Target} = 	ext{Allocated\_Wallet\_Equity} 	imes \left(rac{	ext{BASE\_ORDER\_PCT\_OF\_ALLOCATION}}{100}ight)$$
+```
+Base_Margin_Target = Allocated_Wallet_Equity * (BASE_ORDER_PCT_OF_ALLOCATION / 100)
+```
 
 The computed margin is bounded by the exchange's minimum notional filter:
 
-$$	ext{Min\_Required\_Margin} = rac{	ext{MIN\_NOTIONAL}}{	ext{LEVERAGE}}$$
-
-$$	ext{Base\_Margin} = \max(	ext{Base\_Margin\_Target}, 	ext{Min\_Required\_Margin})$$
+```
+Min_Required_Margin = MIN_NOTIONAL / LEVERAGE
+Base_Margin = max(Base_Margin_Target, Min_Required_Margin)
+```
 
 ### 2. Geometric Martingale Averaging Ladder
 
 Upon base order execution, the engine submits a ladder of 18 resting limit orders:
 
 * **Arithmetic Price Grid Spacing:**
-  * For **LONG** positions: $	ext{Price}_i = 	ext{Entry\_Price}_0 	imes \left(1 - rac{	ext{PRICE\_STEP\_PCT}}{100} 	imes iight)$
-  * For **SHORT** positions: $	ext{Price}_i = 	ext{Entry\_Price}_0 	imes \left(1 + rac{	ext{PRICE\_STEP\_PCT}}{100} 	imes iight)$
+  * For **LONG** positions: `Price_i = Entry_Price_0 * (1 - (PRICE_STEP_PCT / 100) * i)`
+  * For **SHORT** positions: `Price_i = Entry_Price_0 * (1 + (PRICE_STEP_PCT / 100) * i)`
 
-* **Geometric Volume Progression ($1.1	imes$ Multiplier):**
-  $$	ext{Margin}_i = 	ext{Base\_Margin} 	imes (	ext{ORDER\_SIZE\_MULTIPLIER}^i)$$
-  $$	ext{Notional}_i = 	ext{Margin}_i 	imes 	ext{LEVERAGE}$$
-  $$	ext{Quantity}_i = 	ext{quantize}\left(rac{	ext{Notional}_i}{	ext{Price}_i}, 	ext{step\_size}ight)$$
+* **Geometric Volume Progression (1.1x Multiplier):**
+  ```
+  Margin_i = Base_Margin * (ORDER_SIZE_MULTIPLIER ** i)
+  Notional_i = Margin_i * LEVERAGE
+  Quantity_i = quantize(Notional_i / Price_i, step_size)
+  ```
 
 ### 3. Mathematical Solvency Guarantee & Leverage Bracket Clamp
 
 To guarantee that all 18 DCA rungs can execute without running out of margin or exceeding Binance leverage bracket caps, the total ladder multiplier sum is solved:
 
-$$	ext{Multiplier\_Sum} = \sum_{i=0}^{18} (1.10^i) = rac{1.10^{19} - 1}{1.10 - 1} pprox 51.159$$
+```
+Multiplier_Sum = Sum_{i=0}^{18} (1.10 ** i) = (1.10^19 - 1) / (1.10 - 1) ~= 51.159
+Max_Allowed_Base_Margin = (Allocated_Equity * 0.95) / Multiplier_Sum
+```
 
-$$	ext{Max\_Allowed\_Base\_Margin} = rac{	ext{Allocated\_Equity} 	imes 0.95}{	ext{Multiplier\_Sum}}$$
-
-The engine strictly bounds $	ext{Base\_Margin} \le 	ext{Max\_Allowed\_Base\_Margin}$ before placing order #0, ensuring complete mathematical solvency across deep 18% market drawdowns.
+The engine strictly bounds `Base_Margin <= Max_Allowed_Base_Margin` before placing order #0, ensuring complete mathematical solvency across deep 18% market drawdowns.
 
 ### 4. Volume-Weighted Average Entry Price (VWAP)
 
 Atomically updated on every partial or complete order fill:
 
-$$	ext{VWAP} = rac{\sum_{k=1}^{n} (	ext{Fill\_Quantity}_k 	imes 	ext{Fill\_Price}_k)}{\sum_{k=1}^{n} 	ext{Fill\_Quantity}_k}$$
-
-$$	ext{Total\_Position\_Quantity} = \sum_{k=1}^{n} 	ext{Fill\_Quantity}_k$$
+```
+VWAP = Sum(Fill_Quantity_k * Fill_Price_k) / Sum(Fill_Quantity_k)
+Total_Position_Quantity = Sum(Fill_Quantity_k)
+```
 
 ### 5. Take Profit Mean-Reversion Target
 
 Maintained on the exchange at a target offset relative to the dynamically moving VWAP:
 
-* For **LONG** positions: $	ext{TP\_Price} = 	ext{VWAP} 	imes \left(1 + rac{	ext{TAKE\_PROFIT\_PCT}}{100}ight)$
-* For **SHORT** positions: $	ext{TP\_Price} = 	ext{VWAP} 	imes \left(1 - rac{	ext{TAKE\_PROFIT\_PCT}}{100}ight)$
+* For **LONG** positions: `TP_Price = VWAP * (1 + (TAKE_PROFIT_PCT / 100))`
+* For **SHORT** positions: `TP_Price = VWAP * (1 - (TAKE_PROFIT_PCT / 100))`
 
 As market price drops and lower DCA rungs execute, VWAP shifts downward. This brings the Take Profit target closer to current market price, enabling profitable exits on minor technical bounces.
 
@@ -218,16 +225,14 @@ As market price drops and lower DCA rungs execute, VWAP shifts downward. This br
 
 ## Dynamic Liquidation-Anchored Stop Loss Engine
 
-Traditional algorithmic trading bots rely on static percentage stop losses (e.g. fixed 40%). Under cross-margin accounting and dynamic position accumulation, static stops fail during volatility spikes—either triggering prematurely or resulting in exchange liquidation.
+Traditional algorithmic trading bots rely on static percentage stop losses (e.g. fixed 40%). Under cross-margin accounting and dynamic position accumulation, static stops fail during volatility spikes, either triggering prematurely or resulting in exchange liquidation.
 
 ### Real-Time Liquidation Floating Formula
 
 The engine continuously queries the live exchange-calculated liquidation price from Binance's `futures_position_information()` endpoint:
 
-* For **LONG** positions:
-  $$	ext{SL\_Trigger\_Price} = 	ext{Liquidation\_Price} 	imes \left(1 + rac{	ext{LIQUIDATION\_BUFFER\_PCT}}{100}ight)$$
-* For **SHORT** positions:
-  $$	ext{SL\_Trigger\_Price} = 	ext{Liquidation\_Price} 	imes \left(1 - rac{	ext{LIQUIDATION\_BUFFER\_PCT}}{100}ight)$$
+* **LONG positions:** `SL_Trigger_Price = Liquidation_Price * (1 + (LIQUIDATION_BUFFER_PCT / 100))`
+* **SHORT positions:** `SL_Trigger_Price = Liquidation_Price * (1 - (LIQUIDATION_BUFFER_PCT / 100))`
 
 Under the default configuration (`LIQUIDATION_BUFFER_PCT = 1.5%`), the stop loss order sits **1.5% above the actual liquidation price** for long positions. This guarantees that positions are closed via market order before exchange liquidation penalties, maintenance margin deficits, or insurance fund fees are incurred.
 
@@ -248,7 +253,7 @@ The bot supports three directional execution configurations:
 | **`BOTH`** | `TRADING_MODE = "BOTH"` | Trades bidirectionally. Can alternate between LONG and SHORT based on auto-flip triggers or moving average trend filters. | Ranging Volatile Regimes, Choppy Sideways Consolidation |
 
 ### Trend Filter & Auto-Flip Controls:
-* **Auto-Flip on Stop-Loss (`ENABLE_AUTO_FLIP = True`):** Automatically reverses trading direction (`LONG` $\leftrightarrow$ `SHORT`) after a Stop-Loss is hit when in `BOTH` mode.
+* **Auto-Flip on Stop-Loss (`ENABLE_AUTO_FLIP = True`):** Automatically reverses trading direction (`LONG` <-> `SHORT`) after a Stop-Loss is hit when in `BOTH` mode.
 * **Moving Average Trend Filter (`USE_TREND_MA_FILTER = True`):** Queries 5-minute Kline candles and computes a 20-period Simple Moving Average (SMA). If current price is above 20-SMA, the next round opens `LONG`; if below, it opens `SHORT`.
 
 ---
@@ -297,10 +302,10 @@ All operational parameters are defined at the top of `code.py` and can be custom
 | `BASE_ORDER_USDT` | `float` | `6.0` | Static fallback base order margin in USDT if dynamic sizing is disabled. |
 | `PRICE_STEP_PCT` | `float` | `1.0` | Distance between each successive DCA averaging rung in percent (1.0% spacing). |
 | `TAKE_PROFIT_PCT` | `float` | `1.0` | Target profit percentage above or below volume-weighted average entry price (1.0%). |
-| `ORDER_SIZE_MULTIPLIER` | `float` | `1.1` | Geometric volume progression factor across DCA rungs ($1.1	imes$). |
+| `ORDER_SIZE_MULTIPLIER` | `float` | `1.1` | Geometric volume progression factor across DCA rungs (1.1x). |
 | `MIN_DCA_ORDERS` | `int` | `18` | Total number of resting DCA limit averaging orders placed on exchange (18 rungs). |
 | `TRADING_MODE` | `str` | `"LONG_ONLY"` | Trading bias: `"LONG_ONLY"`, `"SHORT_ONLY"`, or `"BOTH"`. |
-| `ENABLE_AUTO_FLIP` | `bool` | `False` | When `TRADING_MODE="BOTH"`, `True` flips direction (`LONG` $\leftrightarrow$ `SHORT`) on Stop-Loss. |
+| `ENABLE_AUTO_FLIP` | `bool` | `False` | When `TRADING_MODE="BOTH"`, `True` flips direction (`LONG` <-> `SHORT`) on Stop-Loss. |
 | `INITIAL_DIRECTION` | `str` | `"LONG"` | Default starting bias on fresh startup when `TRADING_MODE="BOTH"`. |
 | `USE_DYNAMIC_LIQUIDATION_SL` | `bool` | `True` | `True` anchors Stop-Loss to live exchange liquidation price. |
 | `LIQUIDATION_BUFFER_PCT` | `float` | `1.5` | Safety buffer percentage before liquidation price (1.5% above liquidation for LONG). |
@@ -340,7 +345,7 @@ All operational parameters are defined at the top of `code.py` and can be custom
 
 ### 1. Clone or Download the Project Directory
 
-Ensure your directory contains `code.py`, `Requirements.txt`, and `.env.example`.
+Ensure your directory contains `code.py`, `requirements.txt`, and `.env.example`.
 
 ### 2. Create and Activate a Python Virtual Environment
 
@@ -353,20 +358,20 @@ Ensure your directory contains `code.py`, `Requirements.txt`, and `.env.example`
 * **On Windows (PowerShell):**
   ```powershell
   python -m venv venv
-  .env\Scripts\Activate.ps1
+  .\venv\Scripts\Activate.ps1
   ```
 
 * **On Windows (Command Prompt):**
   ```cmd
   python -m venv venv
-  .env\Scriptsctivate.bat
+  .\venv\Scripts\activate.bat
   ```
 
 ### 3. Install Required Dependencies
 
 ```bash
 pip install --upgrade pip
-pip install -r Requirements.txt
+pip install -r requirements.txt
 ```
 
 Verified core dependencies installed:
@@ -480,8 +485,8 @@ Create a `Dockerfile` in the root directory:
 ```dockerfile
 FROM python:3.11-slim
 WORKDIR /app
-COPY Requirements.txt .
-RUN pip install --no-cache-dir -r Requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 CMD ["python", "code.py"]
 ```
@@ -569,9 +574,9 @@ Timestamp,Round,Symbol,Direction,Entry_Price,Exit_Price,Quantity,Realized_PnL_US
 The engine features non-blocking, asynchronous out-of-band alert dispatching executed in dedicated background daemon threads.
 
 ```
-🚨 BOT ALERT: [SOLUSDT] Round #14 closed via TAKE_PROFIT | Realized PnL: +$8.42 USDT | Account Equity: $1,054.20 USDT
-🚨 BOT ALERT: [SOLUSDT] Anti-whipsaw circuit breaker triggered (2 consecutive Stop Losses). Pausing trading for 300s.
-🚨 BOT ALERT: EMERGENCY KILL-SWITCH ACTIVATED! 50% drawdown reached. Flattened all positions. Trading halted permanently.
+[BOT ALERT] [SOLUSDT] Round #14 closed via TAKE_PROFIT | Realized PnL: +8.42 USDT | Account Equity: 1054.20 USDT
+[BOT ALERT] [SOLUSDT] Anti-whipsaw circuit breaker triggered (2 consecutive Stop Losses). Pausing trading for 300s.
+[BOT ALERT] EMERGENCY KILL-SWITCH ACTIVATED! 50% drawdown reached. Flattened all positions. Trading halted permanently.
 ```
 
 ### Setting Up Telegram Alerts:
@@ -580,7 +585,7 @@ The engine features non-blocking, asynchronous out-of-band alert dispatching exe
 3. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in your `.env` file.
 
 ### Setting Up Discord Alerts:
-1. In your Discord server, go to **Channel Settings** $ightarrow$ **Integrations** $ightarrow$ **Webhooks** $ightarrow$ **New Webhook**.
+1. In your Discord server, go to **Channel Settings** -> **Integrations** -> **Webhooks** -> **New Webhook**.
 2. Copy the Webhook URL and set `WEBHOOK_URL` in your `.env` file.
 
 ---
@@ -599,7 +604,7 @@ The engine features non-blocking, asynchronous out-of-band alert dispatching exe
 | `MAX_DRAWDOWN_FROM_PEAK_PCT` | `30.0%` | `40.0%` | `45.0%` |
 | `TREND_PAUSE_SECONDS` | `120s` | `60s` | `30s` |
 | **Grid Coverage Depth** | **18.0% Price Drop** | **18.0% Price Drop** | **12.0% Price Drop** |
-| **Est. Monthly Return** | **12% – 25%** | **20% – 45%** | **30% – 60%** |
+| **Est. Monthly Return** | **12% - 25%** | **20% - 45%** | **30% - 60%** |
 
 ---
 
@@ -631,7 +636,9 @@ Assuming a **1,000 USDT** account balance with `BASE_ORDER_PCT_OF_ALLOCATION = 2
 | 17 | 17.0% | 101.09 | 911.98 | 1,823.96 | 5.05x |
 | **18** | **18.0%** | **111.20** | **1,023.18** | **2,046.36** | **5.56x** |
 
-$$	ext{Total Cumulative Ladder Multiplier} = \sum_{i=0}^{18} 1.10^i pprox 51.159	imes 	ext{Base Margin}$$
+```
+Total Cumulative Ladder Multiplier = Sum_{i=0}^{18} (1.10 ** i) ~= 51.159 * Base Margin
+```
 
 ---
 
@@ -639,13 +646,13 @@ $$	ext{Total Cumulative Ladder Multiplier} = \sum_{i=0}^{18} 1.10^i pprox 51.15
 
 | Account Equity | Base Order Margin | Max Position Notional | Est. Daily Rounds | Est. Daily PnL | Est. Monthly ROI |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **$100 USDT** | $6.00 USDT* | $200 USDT | 12 to 25 | $0.80 – $2.20 | 15% – 35% |
-| **$500 USDT** | $10.00 USDT | $1,000 USDT | 15 to 35 | $3.50 – $9.50 | 18% – 40% |
-| **$1,000 USDT** | $20.00 USDT | $2,000 USDT | 18 to 40 | $8.00 – $22.00 | 20% – 45% |
-| **$5,000 USDT** | $100.00 USDT | $10,000 USDT | 20 to 45 | $45.00 – $120.00 | 22% – 48% |
-| **$10,000 USDT** | $200.00 USDT | $20,000 USDT | 22 to 50 | $95.00 – $250.00 | 25% – 50% |
+| **100 USDT** | 6.00 USDT* | 200 USDT | 12 to 25 | 0.80 - 2.20 USDT | 15% - 35% |
+| **500 USDT** | 10.00 USDT | 1,000 USDT | 15 to 35 | 3.50 - 9.50 USDT | 18% - 40% |
+| **1,000 USDT** | 20.00 USDT | 2,000 USDT | 18 to 40 | 8.00 - 22.00 USDT | 20% - 45% |
+| **5,000 USDT** | 100.00 USDT | 10,000 USDT | 20 to 45 | 45.00 - 120.00 USDT | 22% - 48% |
+| **10,000 USDT** | 200.00 USDT | 20,000 USDT | 22 to 50 | 95.00 - 250.00 USDT | 25% - 50% |
 
-*\*Note: For $100 accounts, base margin is clamped to $6.00 USDT to satisfy Binance `MIN_NOTIONAL` requirements.*
+*\*Note: For 100 USDT accounts, base margin is clamped to 6.00 USDT to satisfy Binance `MIN_NOTIONAL` requirements.*
 
 ---
 

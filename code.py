@@ -306,16 +306,16 @@ def send_alert(message: str):
             # 1. Telegram Notification Dispatch
             if telegram_token and telegram_chat_id:
                 tg_url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
-                payload = json.dumps({"chat_id": telegram_chat_id, "text": f"🚨 BOT ALERT: {message}"}).encode("utf-8")
+                payload = json.dumps({"chat_id": telegram_chat_id, "text": f"[BOT ALERT] {message}"}).encode("utf-8")
                 req = urllib.request.Request(tg_url, data=payload, headers={"Content-Type": "application/json"})
                 urllib.request.urlopen(req, timeout=5)
 
             # 2. Discord / Generic Webhook Dispatch
             if webhook_url:
                 if "discord.com" in webhook_url or "discordapp.com" in webhook_url:
-                    payload = json.dumps({"content": f"🚨 **BOT ALERT**: {message}"}).encode("utf-8")
+                    payload = json.dumps({"content": f"**[BOT ALERT]**: {message}"}).encode("utf-8")
                 else:
-                    payload = json.dumps({"text": f"🚨 BOT ALERT: {message}"}).encode("utf-8")
+                    payload = json.dumps({"text": f"[BOT ALERT] {message}"}).encode("utf-8")
                 req = urllib.request.Request(webhook_url, data=payload, headers={"Content-Type": "application/json"})
                 urllib.request.urlopen(req, timeout=5)
         except Exception as e:
@@ -917,7 +917,7 @@ class DCABot:
                     f"{equity:.4f}",
                 ])
             log.info(
-                f"[{symbol}] 📊 Trade History Logged -> Round {round_number} | {direction} | "
+                f"[{symbol}] Trade History Logged -> Round {round_number} | {direction} | "
                 f"Entry: {entry_price} | Exit: {exit_price} | PnL: {pnl_usdt:+.4f} USDT | "
                 f"Duration: {duration_sec}s | Reason: {exit_reason}"
             )
