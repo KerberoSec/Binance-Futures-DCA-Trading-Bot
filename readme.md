@@ -32,6 +32,7 @@ The engine combines dynamic capital budgeting, geometric position scaling, volum
 17. [Quantitative Financial Modeling & Performance Scenarios](#quantitative-financial-modeling-performance-scenarios)
 18. [Troubleshooting, Edge Cases & Operational FAQ](#troubleshooting-edge-cases-operational-faq)
 19. [MIT License & Risk Disclaimer](#mit-license-risk-disclaimer)
+20. [Author & Connect](#author-connect)
 
 ---
 
@@ -696,7 +697,7 @@ Total Cumulative Ladder Multiplier = Sum_{i=0}^{18} (1.10 ** i) ~= 51.159 * Base
 ```
 MIT License
 
-Copyright (c) 2026
+Copyright (c) 2026 Arun Kumar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -725,3 +726,14 @@ SOFTWARE.
 > * Past performance metrics and hypothetical backtest projections do not guarantee future returns.
 > * Always perform thorough testing on the **Binance Futures Testnet** before deploying live capital.
 > * The authors and maintainers of this software assume no liability or responsibility for financial losses, exchange liquidations, connectivity interruptions, or API outages incurred while operating this trading bot.
+
+---
+
+## Author & Connect
+
+**Arun Kumar**
+
+* **GitHub:** [KerberoSec](https://github.com/KerberoSec/)
+* **LinkedIn:** [Arun Kumar](https://github.com/KerberoSec/)
+* **Instagram:** [@so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/)
+* **X / Twitter:** [@ArunKumar310706](https://x.com/ArunKumar310706)

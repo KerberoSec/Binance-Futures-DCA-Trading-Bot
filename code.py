@@ -6,6 +6,12 @@ Binance USDT-M Futures - Futures DCA Trading Bot
 An institutional-grade, fully autonomous algorithmic Dollar-Cost Averaging (DCA) trading system
 specifically engineered for high-frequency execution on Binance USDT-M Perpetual Futures (SOLUSDT).
 
+Author: Arun Kumar
+GitHub: https://github.com/KerberoSec/
+LinkedIn: https://github.com/KerberoSec/
+Instagram: https://www.instagram.com/so_far_from_your_heart/
+X / Twitter: https://x.com/ArunKumar310706
+
 ====================================================================================================
 1. MATHEMATICAL EXECUTION & CAPITAL BUDGETING MODEL
 ====================================================================================================
@@ -874,7 +880,8 @@ class DCABot:
             duration_sec = round(time.time() - start_time, 1) if start_time > 0 else 0.0
 
             # Calculate Realized PnL in USDT
-            if str(direction).upper() == "LONG":
+            dir_str = direction.value if hasattr(direction, "value") else str(direction)
+            if dir_str.upper() == "LONG":
                 pnl_usdt = (exit_price - entry_price) * quantity
             else:
                 pnl_usdt = (entry_price - exit_price) * quantity
@@ -907,7 +914,7 @@ class DCABot:
                     now_str,
                     round_number,
                     symbol,
-                    direction,
+                    dir_str,
                     f"{entry_price:.6f}",
                     f"{exit_price:.6f}",
                     f"{quantity:.4f}",
@@ -917,7 +924,7 @@ class DCABot:
                     f"{equity:.4f}",
                 ])
             log.info(
-                f"[{symbol}] Trade History Logged -> Round {round_number} | {direction} | "
+                f"[{symbol}] Trade History Logged -> Round {round_number} | {dir_str} | "
                 f"Entry: {entry_price} | Exit: {exit_price} | PnL: {pnl_usdt:+.4f} USDT | "
                 f"Duration: {duration_sec}s | Reason: {exit_reason}"
             )
