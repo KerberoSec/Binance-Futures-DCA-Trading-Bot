@@ -731,9 +731,16 @@ SOFTWARE.
 
 ## Author & Connect
 
-**Arun Kumar**
+Developed and maintained by **Arun Kumar**.
 
-* **GitHub:** [KerberoSec](https://github.com/KerberoSec/)
-* **LinkedIn:** [Arun Kumar](https://github.com/KerberoSec/)
-* **Instagram:** [@so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/)
-* **X / Twitter:** [@ArunKumar310706](https://x.com/ArunKumar310706)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arun%20Kumar-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://github.com/KerberoSec/)
+[![GitHub](https://img.shields.io/badge/GitHub-KerberoSec-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KerberoSec/)
+[![Instagram](https://img.shields.io/badge/Instagram-@so__far__from__your__heart-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/)
+[![X](https://img.shields.io/badge/X-@ArunKumar310706-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
+
+| Platform | Profile Link | Handle |
+| :--- | :--- | :--- |
+| **LinkedIn** | [linkedin.com/in/KerberoSec](https://github.com/KerberoSec/) | `Arun Kumar` |
+| **GitHub** | [github.com/KerberoSec](https://github.com/KerberoSec/) | `@KerberoSec` |
+| **Instagram** | [instagram.com/so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/) | `@so_far_from_your_heart` |
+| **X / Twitter** | [x.com/ArunKumar310706](https://x.com/ArunKumar310706) | `@ArunKumar310706` |

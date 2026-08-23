@@ -7,8 +7,8 @@ An institutional-grade, fully autonomous algorithmic Dollar-Cost Averaging (DCA)
 specifically engineered for high-frequency execution on Binance USDT-M Perpetual Futures (SOLUSDT).
 
 Author: Arun Kumar
-GitHub: https://github.com/KerberoSec/
 LinkedIn: https://github.com/KerberoSec/
+GitHub: https://github.com/KerberoSec/
 Instagram: https://www.instagram.com/so_far_from_your_heart/
 X / Twitter: https://x.com/ArunKumar310706
 
