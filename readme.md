@@ -862,11 +862,13 @@ I design and build institutional grade algorithmic trading systems, custom quant
 
 If you need a custom trading bot, strategy automation, or algorithmic engine built according to your needs, feel free to reach out and connect.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arunkumar31072006/) [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/KerberoSec) [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/) [![X](https://img.shields.io/badge/X-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
+### Connect
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arun%20Kumar-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arunkumar31072006/) [![GitHub](https://img.shields.io/badge/GitHub-KerberoSec-181717?style=flat&logo=github&logoColor=white)](https://github.com/KerberoSec) [![Instagram](https://img.shields.io/badge/Instagram-so__far__from__your__heart-E4405F?style=flat&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/) [![X](https://img.shields.io/badge/X-@ArunKumar310706-000000?style=flat&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
 
 | Platform | Profile Link | Handle |
 | :--- | :--- | :--- |
-| **LinkedIn** | [https://www.linkedin.com/in/arunkumar31072006/](https://www.linkedin.com/in/arunkumar31072006/) | `Arun Kumar` |
-| **GitHub** | [https://github.com/KerberoSec](https://github.com/KerberoSec) | `@KerberoSec` |
-| **Instagram** | [https://www.instagram.com/so_far_from_your_heart/](https://www.instagram.com/so_far_from_your_heart/) | `@so_far_from_your_heart` |
-| **X / Twitter** | [https://x.com/ArunKumar310706](https://x.com/ArunKumar310706) | `@ArunKumar310706` |
+| **LinkedIn** | [linkedin.com/in/arunkumar31072006](https://www.linkedin.com/in/arunkumar31072006/) | [Arun Kumar](https://www.linkedin.com/in/arunkumar31072006/) |
+| **GitHub** | [github.com/KerberoSec](https://github.com/KerberoSec) | [@KerberoSec](https://github.com/KerberoSec) |
+| **Instagram** | [instagram.com/so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/) | [@so_far_from_your_heart](https://www.instagram.com/so_far_from_your_heart/) |
+| **X / Twitter** | [x.com/ArunKumar310706](https://x.com/ArunKumar310706) | [@ArunKumar310706](https://x.com/ArunKumar310706) |
