@@ -457,7 +457,7 @@ tmux attach -t dcabot
 
 ---
 
-### Option 3: 1-Click Automated VPS & Systemd Setup (`setup.sh` - Recommended)
+### Option 3: 1-Click Automated VPS & Systemd Setup (`setup.sh`: Recommended)
 
 The repository includes a production-grade automated deployment script ([`setup.sh`](setup.sh)) designed for Ubuntu and Debian cloud servers.
 
@@ -582,12 +582,12 @@ Before committing live capital, verify bot execution on the Binance Futures Test
 1. **Obtain Testnet Credentials:** Visit [testnet.binancefuture.com](https://testnet.binancefuture.com/), log in with GitHub, and generate testnet API keys. Fund your testnet wallet with virtual USDT.
 2. **Set Testnet Mode:** In `code.py`, ensure `TESTNET = True` is set.
 3. **Run Initial Verification:** Execute `python code.py` and verify the startup checklist:
-   - [x] Successful connection to Binance Testnet REST and WebSocket gateways.
-   - [x] Automatic account balance detection and equity allocation calculation.
-   - [x] Initial base market order fill.
-   - [x] Placement of 18 resting DCA limit orders in the exchange orderbook.
-   - [x] Creation of conditional Take Profit limit and Dynamic Liquidation Stop Loss algo orders.
-   - [x] WebSocket user data stream ingestion and 120-second watchdog heartbeat active.
+   * [x] Successful connection to Binance Testnet REST and WebSocket gateways.
+   * [x] Automatic account balance detection and equity allocation calculation.
+   * [x] Initial base market order fill.
+   * [x] Placement of 18 resting DCA limit orders in the exchange orderbook.
+   * [x] Creation of conditional Take Profit limit and Dynamic Liquidation Stop Loss algo orders.
+   * [x] WebSocket user data stream ingestion and 120-second watchdog heartbeat active.
 
 ---
 
@@ -645,7 +645,7 @@ The engine features non-blocking, asynchronous out-of-band alert dispatching exe
 3. Set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in your `.env` file.
 
 ### Setting Up Discord Alerts:
-1. In your Discord server, go to **Channel Settings** -> **Integrations** -> **Webhooks** -> **New Webhook**.
+1. In your Discord server, go to **Channel Settings** > **Integrations** > **Webhooks** > **New Webhook**.
 2. Copy the Webhook URL and set `WEBHOOK_URL` in your `.env` file.
 
 ---
@@ -664,7 +664,7 @@ The engine features non-blocking, asynchronous out-of-band alert dispatching exe
 | `MAX_DRAWDOWN_FROM_PEAK_PCT` | `30.0%` | `40.0%` | `45.0%` |
 | `TREND_PAUSE_SECONDS` | `120s` | `60s` | `30s` |
 | **Grid Coverage Depth** | **18.0% Price Drop** | **18.0% Price Drop** | **12.0% Price Drop** |
-| **Est. Monthly Return** | **12% - 25%** | **20% - 45%** | **30% - 60%** |
+| **Est. Monthly Return** | **12% to 25%** | **20% to 45%** | **30% to 60%** |
 
 ---
 
@@ -706,11 +706,11 @@ Total Cumulative Ladder Multiplier = Sum_{i=0}^{18} (1.10 ** i) ~= 51.159 * Base
 
 | Account Equity | Base Order Margin | Max Position Notional | Est. Daily Rounds | Est. Daily PnL | Est. Monthly ROI |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **100 USDT** | 6.00 USDT* | 200 USDT | 12 to 25 | 0.80 - 2.20 USDT | 15% - 35% |
-| **500 USDT** | 10.00 USDT | 1,000 USDT | 15 to 35 | 3.50 - 9.50 USDT | 18% - 40% |
-| **1,000 USDT** | 20.00 USDT | 2,000 USDT | 18 to 40 | 8.00 - 22.00 USDT | 20% - 45% |
-| **5,000 USDT** | 100.00 USDT | 10,000 USDT | 20 to 45 | 45.00 - 120.00 USDT | 22% - 48% |
-| **10,000 USDT** | 200.00 USDT | 20,000 USDT | 22 to 50 | 95.00 - 250.00 USDT | 25% - 50% |
+| **100 USDT** | 6.00 USDT* | 200 USDT | 12 to 25 | 0.80 to 2.20 USDT | 15% to 35% |
+| **500 USDT** | 10.00 USDT | 1,000 USDT | 15 to 35 | 3.50 to 9.50 USDT | 18% to 40% |
+| **1,000 USDT** | 20.00 USDT | 2,000 USDT | 18 to 40 | 8.00 to 22.00 USDT | 20% to 45% |
+| **5,000 USDT** | 100.00 USDT | 10,000 USDT | 20 to 45 | 45.00 to 120.00 USDT | 22% to 48% |
+| **10,000 USDT** | 200.00 USDT | 20,000 USDT | 22 to 50 | 95.00 to 250.00 USDT | 25% to 50% |
 
 *\*Note: For 100 USDT accounts, base margin is clamped to 6.00 USDT to satisfy Binance `MIN_NOTIONAL` requirements.*
 
