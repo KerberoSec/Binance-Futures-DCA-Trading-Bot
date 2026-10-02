@@ -853,19 +853,16 @@ Developed and maintained by **Arun Kumar**.
 
 ### Custom Development & Consulting
 
-I design and build institutional-grade algorithmic trading systems, custom quantitative strategies, automated execution pipelines, and AI-driven trading engines tailored to your specific requirements.
+I design and build institutional grade algorithmic trading systems, custom quantitative strategies, automated execution pipelines, and AI driven trading engines tailored to your specific requirements.
 
-* **Custom Trading Strategies:** DCA, Grid, Mean-Reversion, Momentum, Market Making, and Arbitrage models.
+* **Custom Trading Strategies:** DCA, Grid, Mean Reversion, Momentum, Market Making, and Arbitrage models.
 * **Exchange Integrations:** Binance, Bybit, OKX, Hyperliquid, Deribit, and dYdX (Spot and Perpetual Futures).
 * **Automation & Infrastructure:** Linux VPS Daemons, Docker Stacks, WebSocket Data Pipelines, and Webhook Notifications.
 * **AI & Quantitative Systems:** Machine Learning signal models, trend regime filters, and dynamic risk management.
 
 If you need a custom trading bot, strategy automation, or algorithmic engine built according to your needs, feel free to reach out and connect.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arun%20Kumar-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arunkumar31072006/)
-[![GitHub](https://img.shields.io/badge/GitHub-KerberoSec-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KerberoSec)
-[![Instagram](https://img.shields.io/badge/Instagram-@so__far__from__your__heart-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/)
-[![X](https://img.shields.io/badge/X-@ArunKumar310706-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arunkumar31072006/) [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/KerberoSec) [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/so_far_from_your_heart/) [![X](https://img.shields.io/badge/X-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/ArunKumar310706)
 
 | Platform | Profile Link | Handle |
 | :--- | :--- | :--- |
