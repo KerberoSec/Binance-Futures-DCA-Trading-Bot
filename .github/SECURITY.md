@@ -6,8 +6,8 @@ The following table lists the security support status for versions of the Binanc
 
 | Version | Supported |
 | ------- | --------- |
-| 1.0.x   | Yes       |
-| < 1.0.0 | No        |
+| 3.0.x   | Yes       |
+| < 3.0.0 | No        |
 
 ---
 
